@@ -66,7 +66,7 @@ npm run start:prod                       # Run compiled build
 npm test                                 # Unit tests
 npm run test:watch                       # Unit tests in watch mode
 npm run test:cov                         # Coverage report
-npm run test:e2e                         # End-to-end tests (always with --runInBand)
+npm run test:e2e                         # End-to-end tests (serial via maxWorkers: 1)
 
 npx tsc --noEmit                         # Type-check (required before declaring a task done)
 npm run lint                             # ESLint with auto-fix
@@ -84,14 +84,16 @@ curl http://localhost:3000
 
 ### Test execution
 
-Integration and e2e suites share a single test database. They **must** be run with `--runInBand`:
+Integration and e2e suites share a single test database, so they **must** run serially. This is enforced in the Jest config (`maxWorkers: 1` in `package.json` and `test/jest-e2e.json`, which Jest treats as `--runInBand`) — no extra flag needed:
 
 ```bash
-docker compose exec nestjs-api npm test -- --runInBand
-docker compose exec nestjs-api npm run test:e2e   # already configured
+docker compose exec nestjs-api npm test
+docker compose exec nestjs-api npm run test:e2e
 ```
 
-Parallel execution causes FK violations, deadlocks, and cross-suite contamination because suites truncate or seed shared tables concurrently.
+Parallel execution causes FK violations, deadlocks, and cross-suite contamination because suites truncate or seed shared tables concurrently. Do not override `maxWorkers` to run them in parallel.
+
+Both configs also set `testTimeout: 30000`: integration/e2e hooks compile a Nest module and connect to real services, which exceeds Jest's 5 s default on slower hosts (e.g. Docker Desktop on Windows with bind mounts).
 
 During active development, run only the tests related to the file being changed (`npm test -- path/to/file.spec.ts`). Before declaring a task done, run the full suite — see the global `CLAUDE.md` → "Definition of Done (Technical)".
 
