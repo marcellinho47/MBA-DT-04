@@ -1,3 +1,4 @@
+import type { ValidationResult } from 'joi';
 import { envValidationSchema } from './env.validation';
 
 const requiredEnv = {
@@ -8,7 +9,9 @@ const requiredEnv = {
   JWT_REFRESH_SECRET: 'refresh-secret',
 };
 
-const validate = (env: Record<string, string>) =>
+const validate = (
+  env: Record<string, string>,
+): ValidationResult<Record<string, string>> =>
   envValidationSchema.validate(
     { ...requiredEnv, ...env },
     { allowUnknown: true, abortEarly: false },
@@ -32,8 +35,10 @@ describe('envValidationSchema — SWAGGER_ENABLED', () => {
   });
 
   it('should apply default false when SWAGGER_ENABLED is not set', () => {
-    const { value, error } = validate({});
-    expect(error).toBeUndefined();
+    const result = validate({});
+    expect(result.error).toBeUndefined();
+    // Joi types `value` as `any` on the error branch of the result union.
+    const value = result.value as Record<string, string>;
     expect(value.SWAGGER_ENABLED).toBe('false');
   });
 });
