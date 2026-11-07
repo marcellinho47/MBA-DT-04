@@ -156,7 +156,7 @@ NestJS with standard module structure. Source lives in `src/`, compiled output i
 - **TypeScript:** `nodenext` module resolution, `ES2023` target, `strictNullChecks` on, `noImplicitAny` off
 - **Decorators:** `emitDecoratorMetadata` + `experimentalDecorators` enabled — required for NestJS DI
 - **Prettier:** single quotes, trailing commas everywhere
-- **ESLint:** `no-explicit-any` allowed; `no-floating-promises` and `no-unsafe-argument` are warnings
+- **ESLint:** `no-explicit-any` allowed; `no-floating-promises` and `no-unsafe-argument` are warnings. In test files (`*.spec.ts`, `*.integration-spec.ts`, `*.e2e-spec.ts`), `@typescript-eslint/unbound-method` is replaced by `jest/unbound-method` (eslint-plugin-jest), which accepts mock methods passed to `expect()`
 
 ## REST Conventions
 
